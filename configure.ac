@@ -611,6 +611,20 @@ AC_ARG_WITH([experimental-kernel-lib],
   [build_experimental_kernel_lib=$withval],
   [build_experimental_kernel_lib=auto])
 
+# Falcon signature aggregation support
+AC_ARG_ENABLE([falcon],
+  [AS_HELP_STRING([--enable-falcon],
+  [enable Falcon signature aggregation (default is no)])],
+  [use_falcon=$enableval],
+  [use_falcon=no])
+
+# Quantum-resistant proof-of-work
+AC_ARG_ENABLE([qpow],
+  [AS_HELP_STRING([--enable-qpow],
+  [enable quantum-resistant proof-of-work (default is no)])],
+  [use_qpow=$enableval],
+  [use_qpow=no])
+
 AC_ARG_WITH([daemon],
   [AS_HELP_STRING([--with-daemon],
   [build bitcoind daemon (default=yes)])],
@@ -1408,6 +1422,17 @@ AC_MSG_RESULT($build_bitcoind)
 
 AC_MSG_CHECKING([whether to build bitcoin-cli])
 AM_CONDITIONAL([BUILD_BITCOIN_CLI], [test $build_bitcoin_cli = "yes"])
+AM_CONDITIONAL([USE_FALCON], [test "x$use_falcon" = "xyes"])
+AM_CONDITIONAL([USE_QPOW], [test "x$use_qpow" = "xyes"])
+
+if test "x$use_falcon" = "xyes"; then
+  AC_DEFINE([USE_FALCON], [1], [Define to 1 to enable Falcon signature aggregation])
+fi
+
+if test "x$use_qpow" = "xyes"; then
+  AC_DEFINE([USE_QPOW], [1], [Define to 1 to enable quantum-resistant proof-of-work])
+fi
+
 AC_MSG_RESULT($build_bitcoin_cli)
 
 AC_MSG_CHECKING([whether to build bitcoin-tx])
@@ -1531,6 +1556,7 @@ if test "$bitcoin_enable_qt" != "no"; then
       use_qr=yes
     fi
   fi
+
   AC_MSG_RESULT([$use_qr])
 
   if test "$XGETTEXT" = ""; then
@@ -1656,6 +1682,8 @@ AC_SUBST(USE_BDB)
 AC_SUBST(ENABLE_EXTERNAL_SIGNER)
 AC_SUBST(USE_UPNP)
 AC_SUBST(USE_QRCODE)
+AC_SUBST(USE_FALCON)
+AC_SUBST(USE_QPOW)
 AC_SUBST(TESTDEFS)
 AC_SUBST(MINIUPNPC_CPPFLAGS)
 AC_SUBST(MINIUPNPC_LIBS)

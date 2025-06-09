@@ -251,6 +251,7 @@ BITCOIN_CORE_H = \
   policy/rbf.h \
   policy/settings.h \
   policy/truc_policy.h \
+  pow_q/pow_q.h \
   pow.h \
   protocol.h \
   psbt.h \
@@ -451,6 +452,7 @@ libbitcoin_node_a_SOURCES = \
   policy/rbf.cpp \
   policy/settings.cpp \
   policy/truc_policy.cpp \
+  pow_q/pow_q.cpp \
   pow.cpp \
   rest.cpp \
   rpc/blockchain.cpp \
@@ -568,6 +570,8 @@ crypto_libbitcoin_crypto_base_la_SOURCES = \
   crypto/aes.h \
   crypto/chacha20.h \
   crypto/chacha20.cpp \
+  crypto/falconagg/falcon_agg.cpp \
+  crypto/falconagg/falcon_agg.h \
   crypto/chacha20poly1305.h \
   crypto/chacha20poly1305.cpp \
   crypto/common.h \
