@@ -139,6 +139,50 @@ Test key generation using PQC algorithms
 ./src/bitcoin-cli pqc-keygen
 ```
 
+## Developer note — macOS local setup
+
+During local development I needed to install a few macOS packages via Homebrew to run `./autogen.sh`, `./configure` and perform a short smoke build. These are the packages I used and why:
+
+- autoconf, automake, libtool, m4, pkg-config: the GNU autotools chain (provides `aclocal`, `autoreconf`, etc.) required by `./autogen.sh`.
+- gettext: provides `xgettext`/`lupdate` used by translation-related build steps.
+- boost (Homebrew): required C++ libraries/headers (Boost >= 1.73 required by the project).
+- libevent: required by the build (libevent >= 2.1.8).
+
+For a full, up-to-date macOS build guide (including optional dependencies), see `doc/build-osx.md`. The snippet below is one known-good configuration that worked locally.
+
+Reproduce the exact steps I used (copy/paste):
+
+```bash
+# Install autotools, helper tools and runtime deps
+brew install autoconf automake libtool m4 pkg-config gettext boost libevent
+
+# Ensure Homebrew bins are on PATH
+export PATH="$(brew --prefix)/bin:$PATH"
+
+# If Boost was installed to a cellar path, point configure at it.
+# The version can change over time; this uses the currently installed
+# Homebrew Boost version dynamically.
+BOOST_VERSION="$(brew list --versions boost | awk '{print $2}')"
+export BOOST_ROOT="$(brew --cellar boost)/${BOOST_VERSION}"
+export CPPFLAGS="-I${BOOST_ROOT}/include"
+export LDFLAGS="-L${BOOST_ROOT}/lib"
+
+# Regenerate build system and configure (non-Qt GUI build)
+./autogen.sh
+./configure --with-pqc --with-gui=no
+
+# Short smoke build
+make -j2
+```
+
+Historical note (debugging only, not required for normal builds)
+
+- During early debugging, temporary Makefile stubs were created under `src/qt` and `src/test` to help `autoreconf` succeed when some auxiliary files were missing. These files were never meant to be part of the permanent repository and have since been removed. You do **not** need to create or keep any `src/qt/Makefile*` or `src/test/Makefile*` files for a normal build.
+
+Decision note
+
+- Keep `doc/build-osx.md` as the canonical source for macOS build instructions. This developer note is a lightweight, concrete example of one working setup. If you change dependencies or toolchain versions, prefer updating `doc/build-osx.md` and then, if helpful, refreshing this example.
+
 ## Contributions
 
 We welcome contributions to make Bitcoin Core quantum-resistant. Feel free to fork this repository and submit pull requests.
@@ -148,3 +192,4 @@ For discussions and issues, please open an issue on the GitHub repository.
 ## License
 
 This project is licensed under the MIT License. **Made with love by [QBlock](https://github.com/QBlockQ) & [Qbits](https://github.com/QbitsCode))** 💖
+
